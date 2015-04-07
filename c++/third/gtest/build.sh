@@ -6,13 +6,24 @@ cd ${ROOT}/build
 cmake ${ROOT}/${version}
 make 
 
-if [ ! -d ${ROOT}/include ]; then
-    mkdir -p ${ROOT}/include
-fi
+function create_dir() {
+    if [ $# -lt 1 ]; then
+        echo "Wrong Parameter"
+        return
+    fi
 
-if [ ! -d ${ROOT}/lib ]; then
-    mkdir -p ${ROOT}/lib
-fi
+    while [ -n "$1" ]; do
+        path=$1
+
+        if [ -e $path ]; then
+            rm -rf $path
+        fi
+        mkdir -p $path
+        shift 1
+    done
+}
+
+create_dir ${ROOT}/include ${ROOT}/lib
 
 cp ${ROOT}/build/libgtest.a ${ROOT}/lib
 cp ${ROOT}/build/libgtest_main.a ${ROOT}/lib

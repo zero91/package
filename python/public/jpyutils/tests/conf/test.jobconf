@@ -1,0 +1,70 @@
+JOB(
+    jobname = "clean_output_dir",
+    command = "ls",
+    comment = "清除输出目录中原有内容",
+)
+
+JOB(
+    jobname = "copy_and_mark_query",
+    command = "ls;sleep 3",
+    comment = "给query表所有行打上记号q,并拷贝到指定位置",
+    depends = "clean_output_dir",
+)
+
+JOB(
+    jobname = "copy_and_mark_impress",
+    command = "ls;sleep 2",
+    comment = "给impress表所有行打上记号i,并拷贝到指定位置",
+    depends = "clean_output_dir",
+)
+
+JOB(
+    jobname = "copy_and_mark_save",
+    command = "ls;sleep 4",
+    comment = "给save表所有行打上记号s,并拷贝到指定位置",
+    depends = "clean_output_dir",
+)
+
+JOB(
+    jobname = "copy_and_mark_query2provid",
+    command = "ls;sleep 5",
+    comment = "给query2provid表所有行打上记号q2p,并拷贝到指定位置",
+    depends = "clean_output_dir",
+)
+
+JOB(
+    jobname = "copy_and_mark_impress2strategy",
+    command = "ls;sleep 3",
+    comment = "给impress2strategy表所有行打上记号i2s,并拷贝到指定位置",
+    depends = "clean_output_dir"
+)
+
+JOB(
+    jobname = "remove_join_output_dir",
+    command = "ls",
+    comment = "清除最后输出的joined目录中原有内容",
+    depends = "copy_and_mark_query, copy_and_mark_impress, copy_and_mark_save, " + \
+              "copy_and_mark_query2provid, copy_and_mark_impress2strategy",
+)
+
+JOB(
+    jobname = "do_join",
+    command = "ls",
+    comment = "join 5个表，得到kr被动推荐日志大表",
+    depends = "remove_join_output_dir",
+)
+
+JOB(
+    jobname = "clean_tmp_dirs",
+    command = "ls",
+    comment = "清除临时目录",
+    depends = "do_join"
+)
+
+JOB(
+    jobname = "clean_tmp_dirs2",
+    command = "ls",
+    comment = "清除临时目录",
+    depends = "clean_tmp_dirs"
+)
+
