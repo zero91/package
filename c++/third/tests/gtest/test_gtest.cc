@@ -6,6 +6,17 @@ int main(int argc, char *argv[]) {
     return RUN_ALL_TESTS();
 }
 
+class ZeroTest : public ::testing::Test {
+protected:
+    ZeroTest() {}
+    virtual ~ZeroTest() {}
+    virtual void SetUp() {}
+    virtual void TearDown() {}
+};
+
+TEST_F(ZeroTest, test) {
+}
+
 int sum(int a, int b) {
     return a + b;
 }
