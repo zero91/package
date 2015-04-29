@@ -18,19 +18,19 @@ do {                                                                   \
         "[%s:%s:%d] "_fmt_, __FUNCTION__, __FILE__, __LINE__, ##args); \
 } while (0);
 
-#define bm_log_init(dir, args...)  \
+#define bm_log_init(level, dir, fname) \
 do { \
-    bm_utilities::Logger::get_instance()->init(dir, ##args); \
+    bm_utilities::Logger::get_instance()->init(level, dir, fname); \
 } while (0);
 
-#define BM_LOG_TRACE(fmt, arg...) \
+#define bm_log_set_level(level) \
 do { \
-    bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_TRACE, fmt, ##arg); \
-} while (0)
+    bm_utilities::Logger::get_instance()->set_level(level); \
+} while (0);
 
-#define BM_LOG_NOTICE(fmt, arg...) \
+#define BM_LOG_FATAL(fmt, arg...) \
 do { \
-    bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_NOTICE, fmt, ##arg); \
+    bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_FATAL , fmt, ##arg); \
 } while (0)
 
 #define BM_LOG_WARNING(fmt, arg...) \
@@ -38,25 +38,26 @@ do { \
     bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_WARNING, fmt, ##arg); \
 } while (0)
 
-#define BM_LOG_FATAL(fmt, arg...) \
+#define BM_LOG_NOTICE(fmt, arg...) \
 do { \
-    bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_FATAL , fmt, ##arg); \
+    bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_NOTICE, fmt, ##arg); \
 } while (0)
 
-#ifdef NDEBUG
-#define BM_LOG_DEBUG(fmt, arg...) ((void *)(0))
-#else
+#define BM_LOG_TRACE(fmt, arg...) \
+do { \
+    bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_TRACE, fmt, ##arg); \
+} while (0)
+
 #define BM_LOG_DEBUG(fmt, arg...) \
 do { \
     bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_DEBUG, fmt, ##arg); \
 } while (0)
-#endif
 
-enum LoggerLevel {
-    BM_LOG_LEVEL_TRACE     = 1,
-    BM_LOG_LEVEL_NOTICE    = 2,
-    BM_LOG_LEVEL_WARNING   = 4,
-    BM_LOG_LEVEL_FATAL     = 8,
+enum LogLevel {
+    BM_LOG_LEVEL_FATAL     = 1,
+    BM_LOG_LEVEL_WARNING   = 2,
+    BM_LOG_LEVEL_NOTICE    = 4,
+    BM_LOG_LEVEL_TRACE     = 8,
     BM_LOG_LEVEL_DEBUG     = 16
 };
 
@@ -72,9 +73,13 @@ public:
 
     bool is_init() { return _is_inited; }
 
-    void init(const std::string &dir, const std::string &fname);
+    void init(int level, const std::string &dir, const std::string &fname);
 
-    bool write_log(enum LoggerLevel level, const char *fmt, ...);
+    void set_level(int level) {
+        _log_level = LogLevel(level);
+    }
+
+    bool write_log(LogLevel level, const char *fmt, ...);
 
 private:
     DISALLOW_COPY_AND_ASSIGN(Logger);
@@ -86,14 +91,7 @@ private:
 
         _flog   = stdout;
         _ffatal = stderr;
-
-#ifdef NDEBUG
-        _debug_mode = false;
-#else
-        _fdebug = stdout;
-        pthread_mutex_init(&_fdebug_lock, NULL);
-        _debug_mode = true;
-#endif
+        _log_level = BM_LOG_LEVEL_DEBUG;
     }
 
 private:
@@ -106,10 +104,7 @@ private:
     bool _is_inited;
     pthread_mutex_t _init_lock;
 
-    bool _debug_mode;
-
-    FILE *_fdebug;
-    pthread_mutex_t _fdebug_lock;
+    LogLevel _log_level;
 }; // END class Logger
 
 } // END namespace bm_utilities
