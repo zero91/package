@@ -2,7 +2,13 @@ import sys
 
 from jpyutils import task_runner
 
-if __name__ == '__main__':
+def test_add_job():
+    task = task_runner.Task("../log");
+    task.add_job("test001", "sleep 2", comment="sleep", shell=True);
+    task.add_job("test002", "sleep 1", comment="sleep2", depends="test001", shell=True);
+    task.run();
+
+def test_add_jobs_from_file():
     render_arguments = dict()
 
     render_arguments["LOCAL_ROOT"] = "../"
@@ -13,6 +19,11 @@ if __name__ == '__main__':
     render_arguments["HDFS_ORIGIN_LOG_DIR"] = "/app/ecom/fcr-opt/kr/analytics"
 
     t = task_runner.Task("../log", render_arguments, parallel_degree=4)
-    t.add_job_from_file("../conf/test.jobconf", "gbk")
+    t.add_jobs_from_file("../conf/test.jobconf", "gbk")
     #t.list_jobs()
     t.run()
+
+if __name__ == '__main__':
+    test_add_job()
+    test_add_jobs_from_file()
+

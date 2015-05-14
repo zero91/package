@@ -4,6 +4,8 @@ import os
 import re
 import sys
 
+__all__ = ["check_float", "color_str", "shell_info"]
+
 def check_float(float_str):
     """ Judge whether a string is a float number
 

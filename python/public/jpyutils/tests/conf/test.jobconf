@@ -9,6 +9,7 @@ JOB(
     command = "ls;sleep 3",
     comment = "给query表所有行打上记号q,并拷贝到指定位置",
     depends = "clean_output_dir",
+    shell   = True,
 )
 
 JOB(
@@ -16,6 +17,7 @@ JOB(
     command = "ls;sleep 2",
     comment = "给impress表所有行打上记号i,并拷贝到指定位置",
     depends = "clean_output_dir",
+    shell   = True,
 )
 
 JOB(
@@ -23,6 +25,7 @@ JOB(
     command = "ls;sleep 4",
     comment = "给save表所有行打上记号s,并拷贝到指定位置",
     depends = "clean_output_dir",
+    shell   = True,
 )
 
 JOB(
@@ -30,13 +33,15 @@ JOB(
     command = "ls;sleep 5",
     comment = "给query2provid表所有行打上记号q2p,并拷贝到指定位置",
     depends = "clean_output_dir",
+    shell   = True,
 )
 
 JOB(
     jobname = "copy_and_mark_impress2strategy",
     command = "ls;sleep 3",
     comment = "给impress2strategy表所有行打上记号i2s,并拷贝到指定位置",
-    depends = "clean_output_dir"
+    depends = "clean_output_dir",
+    shell   = True,
 )
 
 JOB(
