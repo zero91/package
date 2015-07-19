@@ -1,4 +1,4 @@
-#include "bm_log.h"
+#include "log.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -8,7 +8,8 @@
 #include <sys/stat.h>
 #include <dirent.h>
 
-namespace bm_utilities {
+namespace bm {
+namespace log {
 
 Logger::~Logger() {
     pthread_mutex_destroy(&_flog_lock);
@@ -26,7 +27,7 @@ void Logger::init(int level, const std::string &dir, const std::string &fname) {
     if (_is_inited) {
         return;
     }
-    _log_level = LogLevel(level);
+    _log_level = BMLogLevel(level);
     std::string path = dir + "/" + fname;
 
     int ret = mkdir(dir.c_str(), 0775);
@@ -56,7 +57,7 @@ void Logger::init(int level, const std::string &dir, const std::string &fname) {
     pthread_mutex_unlock(&_init_lock);
 }
 
-bool Logger::write_log(LogLevel level, const char *fmt, ...) {
+bool Logger::write_log(BMLogLevel level, const char *fmt, ...) {
     if (level > _log_level) {
         return true;
     }
@@ -72,7 +73,7 @@ bool Logger::write_log(LogLevel level, const char *fmt, ...) {
     char buffer[4096];
 
     va_start(ap, fmt);
-    vsprintf(buffer, fmt, ap);
+    vsnprintf(buffer, sizeof(buffer), fmt, ap);
     va_end(ap);
 
     switch (level) {
@@ -114,4 +115,5 @@ bool Logger::write_log(LogLevel level, const char *fmt, ...) {
     return true;
 }
 
-} // END namespace bm_utilities
+} // END namespace log
+} // END namespace bm

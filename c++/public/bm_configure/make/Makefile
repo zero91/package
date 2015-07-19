@@ -1,31 +1,33 @@
 AR := ar crs
+WORK_ROOT=../../..
 LOCAL_ROOT=..
 
 CXX=g++
-CXXFLAGS=-pipe -Wall -W -g -fPIC -O
-
-OUTPUT_DIR=$(LOCAL_ROOT)/make/output
+CXXFLAGS=-pipe -Wall -W -fPIC -O
+INCLUDE=-I$(WORK_ROOT)/public/bm_log/include
+LIBRARY=-L$(WORK_ROOT)/public/bm_log/lib
 
 SOURCE_DIR=$(LOCAL_ROOT)/src
-SOURCE=$(foreach dir,$(subst :, ,$(SOURCE_DIR)),$(wildcard $(dir)/*.cc))
-
+OUTPUT_DIR=$(LOCAL_ROOT)/make/output
 OBJECT_DIR=$(OUTPUT_DIR)/obj
-OBJECT=$(addprefix $(OBJECT_DIR)/,$(foreach obj,$(subst .cc,.o,$(SOURCE)),$(shell basename $(obj))))
-
 TARGET_DIR=$(OUTPUT_DIR)/lib
-TARGET=$(TARGET_DIR)/libbm_log.a
+
+SOURCE=$(foreach dir,$(subst :, ,$(SOURCE_DIR)),$(wildcard $(dir)/*.cc))
+OBJECT = $(addprefix $(OBJECT_DIR)/, \
+			$(foreach obj,$(subst .cc,.o,$(SOURCE)),$(shell basename $(obj))))
+TARGET=$(TARGET_DIR)/libbm_configure.a
 
 MAKE_DIR := $(shell mkdir -p $(OBJECT_DIR) $(TARGET_DIR))
 
 all: $(TARGET)
 	@echo "\033[1;5;32mBuild $^ succeed\033[0m"
 
-$(OBJECT): $(SOURCE)
-	$(CXX) -c -o $@ $< $(CXXFLAGS)
+$(OBJECT): $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.cc
+	$(CXX) -c -o $@ $< $(CXXFLAGS) $(INCLUDE)
 
-$(TARGET): $(OBJECT)
+$(TARGET): $(OBJECT) $(WORK_ROOT)/public/bm_log/lib/libbm_log.a
 	@rm -rf $@
-	$(AR) $@ $^
+	$(AR) $@ $^ 
 
 publish: $(TARGET)
 	rm -rf $(LOCAL_ROOT)/include

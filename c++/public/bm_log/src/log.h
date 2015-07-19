@@ -1,5 +1,5 @@
-#ifndef _BM_LOG_H_
-#define _BM_LOG_H_
+#ifndef BM_LOG_LOG_H
+#define BM_LOG_LOG_H
 
 #include <pthread.h>
 #include <string>
@@ -14,46 +14,46 @@
 
 #define bm_log_write(level, _fmt_, args...)                            \
 do {                                                                   \
-    bm_utilities::Logger::get_instance()->write_log(level,             \
+    bm::log::Logger::get_instance()->write_log(level,             \
         "[%s:%s:%d] "_fmt_, __FUNCTION__, __FILE__, __LINE__, ##args); \
 } while (0);
 
 #define bm_log_init(level, dir, fname) \
 do { \
-    bm_utilities::Logger::get_instance()->init(level, dir, fname); \
+    bm::log::Logger::get_instance()->init(level, dir, fname); \
 } while (0);
 
 #define bm_log_set_level(level) \
 do { \
-    bm_utilities::Logger::get_instance()->set_level(level); \
+    bm::log::Logger::get_instance()->set_level(level); \
 } while (0);
 
 #define BM_LOG_FATAL(fmt, arg...) \
 do { \
-    bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_FATAL , fmt, ##arg); \
+    bm_log_write(BM_LOG_LEVEL_FATAL , fmt, ##arg); \
 } while (0)
 
 #define BM_LOG_WARNING(fmt, arg...) \
 do { \
-    bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_WARNING, fmt, ##arg); \
+    bm_log_write(BM_LOG_LEVEL_WARNING, fmt, ##arg); \
 } while (0)
 
 #define BM_LOG_NOTICE(fmt, arg...) \
 do { \
-    bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_NOTICE, fmt, ##arg); \
+    bm_log_write(BM_LOG_LEVEL_NOTICE, fmt, ##arg); \
 } while (0)
 
 #define BM_LOG_TRACE(fmt, arg...) \
 do { \
-    bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_TRACE, fmt, ##arg); \
+    bm_log_write(BM_LOG_LEVEL_TRACE, fmt, ##arg); \
 } while (0)
 
 #define BM_LOG_DEBUG(fmt, arg...) \
 do { \
-    bm_utilities::bm_writelog(bm_utilities::BM_LOG_LEVEL_DEBUG, fmt, ##arg); \
+    bm_log_write(BM_LOG_LEVEL_DEBUG, fmt, ##arg); \
 } while (0)
 
-enum LogLevel {
+enum BMLogLevel {
     BM_LOG_LEVEL_FATAL     = 1,
     BM_LOG_LEVEL_WARNING   = 2,
     BM_LOG_LEVEL_NOTICE    = 4,
@@ -61,7 +61,9 @@ enum LogLevel {
     BM_LOG_LEVEL_DEBUG     = 16
 };
 
-namespace bm_utilities {
+namespace bm {
+namespace log {
+
 class Logger {
 public:
     static Logger *get_instance() {
@@ -76,10 +78,10 @@ public:
     void init(int level, const std::string &dir, const std::string &fname);
 
     void set_level(int level) {
-        _log_level = LogLevel(level);
+        _log_level = BMLogLevel(level);
     }
 
-    bool write_log(LogLevel level, const char *fmt, ...);
+    bool write_log(BMLogLevel level, const char *fmt, ...);
 
 private:
     DISALLOW_COPY_AND_ASSIGN(Logger);
@@ -104,9 +106,10 @@ private:
     bool _is_inited;
     pthread_mutex_t _init_lock;
 
-    LogLevel _log_level;
+    BMLogLevel _log_level;
 }; // END class Logger
 
-} // END namespace bm_utilities
+} // END namespace log
+} // END namespace bm
 
-#endif // END _BM_LOG_H_
+#endif // END BM_LOG_LOG_H
